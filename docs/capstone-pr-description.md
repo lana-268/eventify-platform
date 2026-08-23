@@ -16,7 +16,7 @@ Eventify v1.0 combines authenticated event management, Serializable booking and 
 - [x] `GET https://eventify-platform-wnhu.onrender.com/health` returns 200
 - [x] Live signup, login, event listing, and confirmed booking demonstrated
 
-![Deliberately red GitHub Actions checks job](evidence/red-ci-run.png)
+![Deliberately red GitHub Actions checks job](https://raw.githubusercontent.com/lana-268/eventify-platform/capstone-eventify-v1/docs/evidence/red-ci-run.png)
 
 The required capstone integration suite covers signup/login and refresh rotation, ORGANIZER-versus-ATTENDEE event creation, full-event `WAITLISTED` behavior, cancel-then-rebook row reactivation, and cache invalidation. Vitest forces `eventify_test` before imports and disables file parallelism.
 
