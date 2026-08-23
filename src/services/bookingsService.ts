@@ -1,7 +1,9 @@
 import { type Booking } from "../domain.ts";
+import { type AuthenticatedUser } from "../auth/accessToken.ts";
 import { prisma } from "../lib/prisma.ts";
 import { cancelBookingById, findBookingById } from "../repositories/bookingsRepository.ts";
 import { HttpError } from "../utils/httpError.ts";
+import { enqueueWaitlistPromotion } from "../jobs/waitlist.queue.ts";
 
 export interface CreateBookingInput {
   eventId: string;
@@ -44,9 +46,7 @@ export async function createBooking(userId: string, input: CreateBookingInput): 
         const confirmedBookings = await tx.booking.count({
           where: { eventId: input.eventId, status: "CONFIRMED" },
         });
-        if (confirmedBookings >= event.capacity) {
-          throw new HttpError(409, "Event capacity has been reached");
-        }
+        const status = confirmedBookings >= event.capacity ? "WAITLISTED" : "CONFIRMED";
 
         const bookingKey = { userId, eventId: input.eventId };
         const existing = await tx.booking.findUnique({
@@ -56,7 +56,7 @@ export async function createBooking(userId: string, input: CreateBookingInput): 
         if (existing?.status === "CANCELLED") {
           const rebooked = await tx.booking.update({
             where: { userId_eventId: bookingKey },
-            data: { status: "CONFIRMED" },
+            data: { status },
           });
           return toDomain(rebooked);
         }
@@ -68,7 +68,7 @@ export async function createBooking(userId: string, input: CreateBookingInput): 
         // If a confirmed row already exists, create deliberately reaches the
         // unique constraint so the P2002 handler remains the final race-safe guard.
         const booking = await tx.booking.create({
-          data: { ...bookingKey, status: "CONFIRMED" },
+          data: { ...bookingKey, status },
         });
         return toDomain(booking);
       }, { isolationLevel: "Serializable" });
@@ -87,16 +87,29 @@ export async function createBooking(userId: string, input: CreateBookingInput): 
   throw new HttpError(409, "Booking could not be completed");
 }
 
-export async function getBookingById(id: string): Promise<Booking> {
+export async function getBookingById(id: string, auth: AuthenticatedUser): Promise<Booking> {
   const booking = await findBookingById(id);
   if (!booking) {
     throw new HttpError(404, "Booking not found");
   }
+  if (auth.role !== "ADMIN" && booking.userId !== auth.id) {
+    throw new HttpError(403, "Forbidden");
+  }
   return booking;
 }
 
-export async function cancelBooking(id: string): Promise<Booking> {
-  const booking = await cancelBookingById(id);
+export async function cancelBooking(id: string, auth: AuthenticatedUser): Promise<Booking> {
+  const booking = await findBookingById(id);
   if (!booking) throw new HttpError(404, "Booking not found");
-  return booking;
+  if (booking.userId !== auth.id) throw new HttpError(403, "Forbidden");
+  const { booking: cancelled, releasedCapacity } = await cancelBookingById(id);
+  if (!cancelled) throw new HttpError(404, "Booking not found");
+  if (releasedCapacity) {
+    try {
+      await enqueueWaitlistPromotion(booking.eventId);
+    } catch (error) {
+      console.error(JSON.stringify({ event: "waitlist_enqueue_failed", eventId: booking.eventId, message: String(error) }));
+    }
+  }
+  return cancelled;
 }

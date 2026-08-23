@@ -9,15 +9,16 @@ import {
   handleUpdateVenue,
   handleDeleteVenue,
 } from "../controllers/venuesController.ts";
-import { asyncHandler } from "../utils/asyncHandler.ts";
+import { requireAuth, requireRole } from "../middleware/auth.ts";
 
 const venuesRouter = Router();
+venuesRouter.use(requireAuth);
 
 const createVenueSchema = z.object({
   name: z.string().min(1, "Name is required"),
   address: z.string().min(1, "Address is required"),
   capacity: z.number().int().positive("Capacity must be a positive integer"),
-  contactEmail: z.string().email("Valid email is required"),
+  contactEmail: z.email("Valid email is required"),
 }).strict();
 
 const listVenuesSchema = z.object({
@@ -32,24 +33,25 @@ const updateVenueSchema = z.object({
   name: z.string().min(1).optional(),
   address: z.string().min(1).optional(),
   capacity: z.number().int().positive().optional(),
-  contactEmail: z.string().email().optional(),
+  contactEmail: z.email().optional(),
 }).strict().refine((value) => Object.keys(value).length > 0, {
   message: "At least one field is required",
 });
 
-venuesRouter.post("/", validate(createVenueSchema), asyncHandler(handleCreateVenue));
+venuesRouter.post("/", requireRole("ORGANIZER", "ADMIN"), validate(createVenueSchema), handleCreateVenue);
 
-venuesRouter.get("/", validateQuery(listVenuesSchema), asyncHandler(handleListVenues));
+venuesRouter.get("/", validateQuery(listVenuesSchema), handleListVenues);
 
-venuesRouter.get("/:id", validateParams(venueParamsSchema), asyncHandler(handleGetVenue));
+venuesRouter.get("/:id", validateParams(venueParamsSchema), handleGetVenue);
 
 venuesRouter.patch(
   "/:id",
+  requireRole("ORGANIZER", "ADMIN"),
   validateParams(venueParamsSchema),
   validate(updateVenueSchema),
-  asyncHandler(handleUpdateVenue),
+  handleUpdateVenue,
 );
 
-venuesRouter.delete("/:id", validateParams(venueParamsSchema), asyncHandler(handleDeleteVenue));
+venuesRouter.delete("/:id", requireRole("ORGANIZER", "ADMIN"), validateParams(venueParamsSchema), handleDeleteVenue);
 
 export { venuesRouter };

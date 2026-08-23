@@ -9,13 +9,15 @@ datasource db {
 }
 
 model User {
-  id        String    @id
-  email     String    @unique
-  name      String
-  role      Role      @default(ATTENDEE)
-  createdAt DateTime  @default(now())
-  bookings  Booking[]
-  events    Event[]   @relation("OrganizerEvents")
+  id            String         @id
+  email         String         @unique
+  passwordHash  String
+  name          String
+  role          Role           @default(ATTENDEE)
+  createdAt     DateTime       @default(now())
+  bookings      Booking[]
+  events        Event[]        @relation("OrganizerEvents")
+  refreshTokens RefreshToken[]
 }
 
 model Event {
@@ -43,6 +45,22 @@ model Booking {
 
   @@unique([userId, eventId])
   @@index([userId, createdAt(sort: Desc)])
+}
+
+model RefreshToken {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  tokenHash    String    @unique
+  userId       String
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  replacedById String?   @unique @db.Uuid
+  createdAt    DateTime  @default(now())
+
+  user       User          @relation(fields: [userId], references: [id])
+  replacedBy RefreshToken? @relation("RotationChain", fields: [replacedById], references: [id])
+  replaces   RefreshToken? @relation("RotationChain")
+
+  @@index([userId])
 }
 
 enum Role {

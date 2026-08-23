@@ -2,8 +2,8 @@ import { Router } from "express";
 import { z } from "zod";
 
 import { handleCreateEvent, handleDeleteEvent, handleGetEvent, handleListEvents, handleUpdateEvent } from "../controllers/eventsController.ts";
+import { requireAuth, requireRole } from "../middleware/auth.ts";
 import { validate, validateParams, validateQuery } from "../middleware/validate.ts";
-import { asyncHandler } from "../utils/asyncHandler.ts";
 
 const eventsRouter = Router();
 
@@ -22,17 +22,16 @@ const eventSchema = z.strictObject({
   startsAt: z.iso.datetime(),
   capacity: z.number().int().positive(),
   priceCents: z.number().int().nonnegative(),
-  organizerId: z.string().min(1).optional(),
 });
 
 const eventParamsSchema = z.strictObject({
   id: z.string().uuid("Invalid event ID"),
 });
 
-eventsRouter.post("/", validate(eventSchema), asyncHandler(handleCreateEvent));
-eventsRouter.get("/", validateQuery(listEventsSchema), asyncHandler(handleListEvents));
-eventsRouter.get("/:id", validateParams(eventParamsSchema), asyncHandler(handleGetEvent));
-eventsRouter.patch("/:id", validateParams(eventParamsSchema), validate(eventSchema.partial()), asyncHandler(handleUpdateEvent));
-eventsRouter.delete("/:id", validateParams(eventParamsSchema), asyncHandler(handleDeleteEvent));
+eventsRouter.get("/", validateQuery(listEventsSchema), handleListEvents);
+eventsRouter.get("/:id", validateParams(eventParamsSchema), handleGetEvent);
+eventsRouter.post("/", requireAuth, requireRole("ORGANIZER", "ADMIN"), validate(eventSchema), handleCreateEvent);
+eventsRouter.patch("/:id", requireAuth, requireRole("ORGANIZER", "ADMIN"), validateParams(eventParamsSchema), validate(eventSchema.partial()), handleUpdateEvent);
+eventsRouter.delete("/:id", requireAuth, requireRole("ORGANIZER", "ADMIN"), validateParams(eventParamsSchema), handleDeleteEvent);
 
 export { eventsRouter };

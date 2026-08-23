@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://eventify:eventify@localhost:5432/eventify_test?schema=public
+      REDIS_URL: redis://localhost:6379
+      JWT_ACCESS_SECRET: ci-only-secret-at-least-32-characters-long
+      WEB_ORIGIN: http://localhost:5173
+      PORT: "3011"
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: eventify
+          POSTGRES_PASSWORD: eventify
+          POSTGRES_DB: eventify_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U eventify -d eventify_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+      redis:
+        image: redis:8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx prisma migrate deploy
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
