@@ -24,4 +24,4 @@
 - [x] Deploy the API on Render with Neon and Upstash secrets, run migrations, seed demo data, and verify health/register/login/booking at the live URL.
 - [x] Choose and document honest API-only queueing on Render's free tier.
 - [x] Capture both deliberately red and recovered green CI `checks` runs.
-- [ ] Make the CI `checks` job required on `main`.
+- [x] Make the CI `checks` job required on `main`.
