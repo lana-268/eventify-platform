@@ -11,7 +11,8 @@
 - [x] Configure Vitest to run files serially and force every test onto `eventify_test` before application imports.
 - [x] Cover registration/login/refresh rotation, role-gated event creation, full-event waitlisting, cancel-then-rebook, and cache invalidation with awaited Supertest requests.
 - [x] Add GitHub Actions services for Postgres and Redis and run migration, lint, typecheck, and the complete test suite.
-- [ ] Verify Prisma validation/generation, lint, typecheck, tests, and production compilation locally.
+- [x] Verify Prisma validation/generation, lint, typecheck, Redis-independent local tests, the full CI suite, and production compilation.
+- [ ] Build and smoke-test the full Compose stack locally when Docker is available.
 
 ## Portfolio documentation
 

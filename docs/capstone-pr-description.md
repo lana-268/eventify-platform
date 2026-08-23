@@ -11,7 +11,7 @@ Eventify v1.0 combines authenticated event management, Serializable booking and 
 - [x] Strict TypeScript typecheck
 - [x] Production TypeScript build
 - [ ] Full PostgreSQL + Redis test suite locally
-- [ ] Green GitHub Actions `checks` job
+- [x] Green GitHub Actions `checks` job ([branch run 32642767093](https://github.com/lana-268/eventify-platform/actions/runs/32642767093))
 - [ ] Deliberately broken commit screenshot showing a red `checks` job
 - [ ] `GET <LIVE_URL>/health` returns 200
 - [ ] Live signup, login, event listing, and confirmed booking demonstrated
