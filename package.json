@@ -9,11 +9,13 @@
   },
   "scripts": {
     "dev": "node --watch --env-file=.env src/server.ts",
+    "worker": "node --watch --env-file=.env src/worker.ts",
     "postinstall": "prisma generate",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run tests/access-token.test.ts",
-    "test:integration": "vitest run tests/session-4-auth.test.ts"
+    "test:integration": "vitest run tests/session-4-auth.test.ts tests/session-5.test.ts",
+    "proof:rate-limit": "node --env-file=.env scripts/rate-limit-proof.ts"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
@@ -31,12 +33,15 @@
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "argon2": "^0.45.1",
+    "bullmq": "^6.0.9",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.23.0",
     "prisma": "^7.9.1",
+    "redis": "^5.0.0",
     "zod": "^4.4.3"
   }
 }

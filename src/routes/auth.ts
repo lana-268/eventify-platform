@@ -4,6 +4,7 @@ import { z } from "zod";
 import { handleLogin, handleRefresh, handleSignup } from "../controllers/authController.ts";
 import { requireTrustedOrigin } from "../middleware/auth.ts";
 import { validate } from "../middleware/validate.ts";
+import { rateLimit } from "../middleware/rateLimit.ts";
 
 const authRouter = Router();
 
@@ -19,7 +20,14 @@ const loginSchema = z.strictObject({
 });
 
 authRouter.post("/signup", validate(signupSchema), handleSignup);
-authRouter.post("/login", validate(loginSchema), handleLogin);
+export const loginRateLimit = { max: 5, windowMs: 60_000 } as const;
+
+authRouter.post(
+  "/login",
+  rateLimit({ ...loginRateLimit, identity: (request) => request.ip ?? "unknown" }),
+  validate(loginSchema),
+  handleLogin,
+);
 authRouter.post("/refresh", requireTrustedOrigin, handleRefresh);
 
 export { authRouter };
