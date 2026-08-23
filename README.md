@@ -2,7 +2,7 @@
 
 Eventify is a production-shaped event booking API built with Express, strict TypeScript, PostgreSQL, Redis, and BullMQ. It supports role-based event management, short-lived access tokens with rotating refresh credentials, serializable capacity enforcement, waitlists, cache-aside event discovery, distributed rate limits, and asynchronous confirmation jobs.
 
-**Live API:** `https://YOUR-RENDER-SERVICE.onrender.com` — replace this placeholder after the Render deployment is verified.
+**Live API:** <https://eventify-platform-wnhu.onrender.com>
 
 ## Architecture
 
@@ -94,7 +94,7 @@ The GitHub Actions `checks` job performs the same migration and gates lint, type
 The production API is designed for a Render web service backed by Neon Postgres and Upstash Redis.
 
 1. Build from this `Dockerfile`; use the image's default `node dist/server.js` command.
-2. Set Render's pre-deploy command to `npx prisma migrate deploy`.
+2. Apply `npx prisma migrate deploy` against Neon before deployment. A paid Render service can configure the same command as its pre-deploy command.
 3. Add `DATABASE_URL`, `REDIS_URL`, `JWT_ACCESS_SECRET`, and `WEB_ORIGIN` in Render's dashboard. Never commit the real values. Render supplies `PORT`.
 4. Run `npx prisma db seed` once against Neon, then verify `/health`, signup, login, event listing, and booking at the public URL.
 
@@ -112,7 +112,7 @@ Render's free tier does not provide a background-worker service type. The honest
 
 ## AI usage and verification
 
-AI helped draft transaction, caching, queue, Docker, CI, test, and documentation changes. I did not accept those drafts as proof. I checked database invariants against the Prisma schema, walked concurrent booking/cache timelines, verified BullMQ v6 against its official node-redis adapter documentation, compiled the emitted JavaScript, and ran Prisma validation/generation, ESLint, TypeScript, and the available automated suites. Provider-dashboard steps, live deployment evidence, and GitHub branch protection remain human-controlled and must be recorded in the capstone PR.
+AI helped draft transaction, caching, queue, Docker, CI, test, and documentation changes. I did not accept those drafts as proof. I checked database invariants against the Prisma schema, walked concurrent booking/cache timelines, verified BullMQ v6 against its official node-redis adapter documentation, compiled the emitted JavaScript, and ran Prisma validation/generation, ESLint, TypeScript, and the available automated suites. I also verified the deployed health, authentication, event-listing, and booking flows against Render, Neon, and Upstash, and recorded deliberate red and recovered green CI evidence in the capstone PR.
 
 ## License
 

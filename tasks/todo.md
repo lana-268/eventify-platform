@@ -17,10 +17,11 @@
 ## Portfolio documentation
 
 - [x] Rewrite the README with the product pitch, architecture, endpoint reference, exact three-command setup, operational commands, decisions/trade-offs, and verified AI usage.
-- [x] Add a capstone PR description covering the implementation, verification, AI assistance, deployment evidence placeholders, and worker trade-off.
+- [x] Add a capstone PR description covering the implementation, verification, AI assistance, deployment evidence, and worker trade-off.
 
 ## Provider and GitHub setup (manual)
 
-- [ ] Deploy the API on Render with Neon and Upstash secrets, run migrations, seed demo data, and verify health/register/login/booking at the live URL.
-- [ ] Choose and document paid worker deployment or honest API-only queueing on Render's free tier.
-- [ ] Make the CI `checks` job required on `main` and capture both deliberately red and final green PR checks.
+- [x] Deploy the API on Render with Neon and Upstash secrets, run migrations, seed demo data, and verify health/register/login/booking at the live URL.
+- [x] Choose and document honest API-only queueing on Render's free tier.
+- [x] Capture both deliberately red and recovered green CI `checks` runs.
+- [ ] Make the CI `checks` job required on `main`.

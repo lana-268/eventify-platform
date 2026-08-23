@@ -28,6 +28,6 @@ AI drafted portions of the Docker/Compose configuration, graceful-shutdown orche
 
 **Live URL:** https://eventify-platform-wnhu.onrender.com
 
-Render uses the Docker image with pre-deploy command `npx prisma migrate deploy`; Neon supplies `DATABASE_URL`, Upstash supplies the Redis-protocol `REDIS_URL`, and the remaining secrets are Render environment variables. Demo data is seeded before grading.
+Render uses the Docker image; Neon supplies `DATABASE_URL`, Upstash supplies the Redis-protocol `REDIS_URL`, and the remaining secrets are Render environment variables. Because this deployment uses Render's free tier, migrations were applied manually with `npx prisma migrate deploy` against Neon before deployment. Demo data is seeded for grading.
 
-Render's free tier has no background-worker service type. If the API-only option is used, jobs remain in Upstash until `node dist/worker.js` runs elsewhere; the API and all synchronous booking behavior remain available. If a paid worker is provisioned, record it here before submission.
+This deployment uses the API-only option because Render's free tier has no background-worker service type. Jobs remain in Upstash until `node dist/worker.js` runs elsewhere; the API and all synchronous booking behavior remain available. A future paid worker can run the same image with that command.
