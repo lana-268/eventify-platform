@@ -11,10 +11,12 @@ Eventify v1.0 combines authenticated event management, Serializable booking and 
 - [x] Strict TypeScript typecheck
 - [x] Production TypeScript build
 - [ ] Full PostgreSQL + Redis test suite locally
-- [x] Green GitHub Actions `checks` job ([branch run 32642767093](https://github.com/lana-268/eventify-platform/actions/runs/32642767093))
-- [ ] Deliberately broken commit screenshot showing a red `checks` job
-- [ ] `GET <LIVE_URL>/health` returns 200
-- [ ] Live signup, login, event listing, and confirmed booking demonstrated
+- [x] Green GitHub Actions `checks` job ([recovery run 32649654235](https://github.com/lana-268/eventify-platform/actions/runs/32649654235))
+- [x] Deliberately broken commit screenshot showing a red `checks` job ([failed run 32649582344](https://github.com/lana-268/eventify-platform/actions/runs/32649582344))
+- [x] `GET https://eventify-platform-wnhu.onrender.com/health` returns 200
+- [x] Live signup, login, event listing, and confirmed booking demonstrated
+
+![Deliberately red GitHub Actions checks job](evidence/red-ci-run.png)
 
 The required capstone integration suite covers signup/login and refresh rotation, ORGANIZER-versus-ATTENDEE event creation, full-event `WAITLISTED` behavior, cancel-then-rebook row reactivation, and cache invalidation. Vitest forces `eventify_test` before imports and disables file parallelism.
 
@@ -24,7 +26,7 @@ AI drafted portions of the Docker/Compose configuration, graceful-shutdown orche
 
 ## Deployment and worker trade-off
 
-**Live URL:** `<LIVE_URL>`
+**Live URL:** https://eventify-platform-wnhu.onrender.com
 
 Render uses the Docker image with pre-deploy command `npx prisma migrate deploy`; Neon supplies `DATABASE_URL`, Upstash supplies the Redis-protocol `REDIS_URL`, and the remaining secrets are Render environment variables. Demo data is seeded before grading.
 
