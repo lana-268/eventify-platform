@@ -1,5 +1,9 @@
 FROM node:24-slim AS build
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
@@ -18,9 +22,15 @@ RUN npx prisma generate && npm run build
 
 FROM node:24-slim AS runtime
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV NODE_ENV=production
 WORKDIR /app
-COPY package.json package-lock.json ./
+RUN chown node:node /app
+COPY --chown=node:node package.json package-lock.json ./
+USER node
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
 COPY --from=build --chown=node:node /app/dist ./dist
@@ -29,6 +39,5 @@ COPY --from=build --chown=node:node /app/prisma.config.ts ./prisma.config.ts
 COPY --from=build --chown=node:node /app/src/config.ts ./src/config.ts
 COPY --from=build --chown=node:node /app/src/generated ./src/generated
 
-USER node
 EXPOSE 3011
 CMD ["node", "dist/server.js"]

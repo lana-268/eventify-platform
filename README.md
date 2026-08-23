@@ -29,7 +29,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-On PowerShell, use `Copy-Item .env.example .env` for the second command. Compose starts PostgreSQL, Redis, a one-shot migration/seed container, the API, and the worker. When the API health check passes, open <http://localhost:3011/health>. The idempotent seed creates demo events with available seats and these local-only accounts, all using password `Eventify123!`:
+On PowerShell, use `Copy-Item .env.example .env` for the second command. Compose starts PostgreSQL, Redis, a one-shot migration/seed container, the API, and the worker. PostgreSQL is exposed on host port `55432` to avoid conflicts with native installations while containers use `db:5432`. When the API health check passes, open <http://localhost:3011/health>. The idempotent seed creates demo events with available seats and these local-only accounts, all using password `Eventify123!`:
 
 - `organizer@eventify.test`
 - `admin@eventify.test`

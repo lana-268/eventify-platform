@@ -10,7 +10,7 @@ Eventify v1.0 combines authenticated event management, Serializable booking and 
 - [x] ESLint
 - [x] Strict TypeScript typecheck
 - [x] Production TypeScript build
-- [ ] Full PostgreSQL + Redis test suite locally
+- [x] Full PostgreSQL + Redis test suite locally (4 files, 17 tests)
 - [x] Green GitHub Actions `checks` job ([recovery run 32649654235](https://github.com/lana-268/eventify-platform/actions/runs/32649654235))
 - [x] Deliberately broken commit screenshot showing a red `checks` job ([failed run 32649582344](https://github.com/lana-268/eventify-platform/actions/runs/32649582344))
 - [x] `GET https://eventify-platform-wnhu.onrender.com/health` returns 200

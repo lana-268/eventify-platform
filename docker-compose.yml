@@ -22,7 +22,7 @@ services:
       POSTGRES_PASSWORD: eventify
       POSTGRES_DB: eventify
     ports:
-      - "5432:5432"
+      - "55432:5432"
     volumes:
       - eventify-postgres:/var/lib/postgresql
       - ./session-3-sandbox-seed.sql:/docker-entrypoint-initdb.d/10-sandbox-seed.sql:ro
