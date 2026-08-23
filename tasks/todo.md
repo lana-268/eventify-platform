@@ -1,26 +1,25 @@
-# Session 5 implementation plan
+# Eventify v1.0 capstone plan
 
-## Redis foundations and caching
+## Production packaging
 
-- [x] Add validated Redis configuration and separate Redis connections for cache/rate limiting and BullMQ.
-- [x] Implement cache-aside event reads with jittered TTLs, versioned list keys, and delete/increment invalidation on writes.
-- [x] Record cache hits and misses and emit a structured ratio every 100 lookups.
+- [ ] Add a non-root, two-stage Node 24 Docker image that generates Prisma before compiling and runs the API or worker directly.
+- [ ] Expand Docker Compose to run the API, worker, Postgres test/development database, and Redis with complete environment configuration and health checks.
+- [ ] Add process-specific graceful shutdown for HTTP, Prisma, Redis, queues, and workers.
 
-## Queues and waitlist promotion (Option A)
+## Isolated integration testing and CI
 
-- [x] Add the booking-email and waitlist-promote queues with retry, exponential backoff, and dead-letter handling.
-- [x] Create WAITLISTED bookings when capacity is full while preserving serializable transaction and rebooking behavior.
-- [x] Enqueue promotion only when a CONFIRMED booking is cancelled.
-- [x] Build a worker that transactionally promotes the oldest waiter after re-checking capacity and then queues its confirmation email.
+- [ ] Configure Vitest to run files serially and force every test onto `eventify_test` before application imports.
+- [ ] Cover registration/login/refresh rotation, role-gated event creation, full-event waitlisting, cancel-then-rebook, and cache invalidation with awaited Supertest requests.
+- [ ] Add GitHub Actions services for Postgres and Redis and run migration, lint, typecheck, and the complete test suite.
+- [ ] Verify Prisma validation/generation, lint, typecheck, tests, and production compilation locally.
 
-## Rate limiting and proof
+## Portfolio documentation
 
-- [x] Apply a strict fixed-window, per-IP Redis limiter to login and a per-user limiter to booking creation.
-- [x] Add automated coverage for cache behavior, rate-limit thresholds/recovery, waitlisting, and idempotent promotion.
-- [x] Add a scripted rate-limit burst proof and document the chosen limits.
-- [x] Document caching-strategy interrogation notes, evidence, and the cache invalidation exit ticket in the PR description.
-- [x] Run Prisma validation/generation, typecheck, lint, and tests; review the final diff.
+- [ ] Rewrite the README with the product pitch, architecture, endpoint reference, exact three-command setup, operational commands, decisions/trade-offs, and verified AI usage.
+- [ ] Add a capstone PR description covering the implementation, verification, AI assistance, deployment evidence placeholders, and worker trade-off.
 
-## Session 6 deploy preparation (manual, secrets stay outside Git)
+## Provider and GitHub setup (manual)
 
-- [ ] Create Render, Neon, and Upstash accounts; provision services and store all three connection strings securely outside the repository.
+- [ ] Deploy the API on Render with Neon and Upstash secrets, run migrations, seed demo data, and verify health/register/login/booking at the live URL.
+- [ ] Choose and document paid worker deployment or honest API-only queueing on Render's free tier.
+- [ ] Make the CI `checks` job required on `main` and capture both deliberately red and final green PR checks.
