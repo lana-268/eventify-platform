@@ -1,11 +1,13 @@
 import argon2 from "argon2";
 import request from "supertest";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createApp } from "../src/app.ts";
 import { config } from "../src/config.ts";
 import { hashRefreshToken } from "../src/auth/refreshToken.ts";
 import { prisma } from "../src/lib/prisma.ts";
+import { getRedis, redis } from "../src/infra/redis.ts";
+import { waitlistQueue } from "../src/jobs/waitlist.queue.ts";
 
 const app = createApp();
 const password = "Eventify123!";
@@ -63,7 +65,13 @@ beforeAll(async () => {
   await prisma.booking.deleteMany({ where: { userId: "auth-attendee", eventId: bookingEventId } });
 });
 
+beforeEach(async () => {
+  await (await getRedis()).flushDb();
+});
+
 afterAll(async () => {
+  await waitlistQueue.close();
+  if (redis.isOpen) await redis.quit();
   await prisma.$disconnect();
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "eventify",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "Eventify - the event booking API built across the course",
@@ -10,11 +10,14 @@
   "scripts": {
     "dev": "node --watch --env-file=.env src/server.ts",
     "worker": "node --watch --env-file=.env src/worker.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "postinstall": "prisma generate",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run tests/access-token.test.ts",
-    "test:integration": "vitest run tests/session-4-auth.test.ts tests/session-5.test.ts",
+    "test": "vitest run",
+    "test:prepare": "node scripts/prepare-test-db.ts",
+    "test:integration": "vitest run tests/capstone.test.ts",
     "proof:rate-limit": "node --env-file=.env scripts/rate-limit-proof.ts"
   },
   "devDependencies": {

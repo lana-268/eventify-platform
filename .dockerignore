@@ -1,0 +1,13 @@
+.git
+.github
+.env
+.npm-cache
+coverage
+dist
+docs
+node_modules
+scripts
+sql
+tasks
+tests
+*.md

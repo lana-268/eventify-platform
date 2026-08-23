@@ -1,6 +1,7 @@
 import { type Job, Worker } from "bullmq";
 
 import { queueBackend } from "./infra/queue-backend.ts";
+import { registerWorkerShutdown } from "./infra/shutdown.ts";
 import { emailDeadLetterQueue, emailQueue, type ConfirmationEmailJob } from "./jobs/email.queue.ts";
 import { promoteOldestWaitlisted } from "./jobs/promoteWaitlist.ts";
 import { type WaitlistPromotionJob } from "./jobs/waitlist.queue.ts";
@@ -35,12 +36,6 @@ for (const worker of [emailWorker, waitlistWorker]) {
   });
 }
 
-async function shutdown(): Promise<void> {
-  await Promise.all([emailWorker.close(), waitlistWorker.close(), emailQueue.close(), emailDeadLetterQueue.close()]);
-  process.exit(0);
-}
-
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+registerWorkerShutdown([emailWorker, waitlistWorker, emailQueue, emailDeadLetterQueue]);
 
 console.log(JSON.stringify({ event: "worker_ready", queues: ["booking-email", "waitlist-promote"] }));

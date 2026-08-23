@@ -2,6 +2,9 @@
 
 -- PostgreSQL runs this file only when the shared data volume is first created.
 -- Keep the SQL practice database separate from Prisma's `eventify` database.
+SELECT 'CREATE DATABASE eventify_test'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'eventify_test') \gexec
+
 SELECT 'CREATE DATABASE sandbox'
 WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'sandbox') \gexec
 
