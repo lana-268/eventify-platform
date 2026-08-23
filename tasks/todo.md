@@ -1,22 +1,26 @@
-# Session 4 implementation plan
+# Session 5 implementation plan
 
-## Authentication
+## Redis foundations and caching
 
-- [x] Extend validated configuration and the example environment with the access-token secret and trusted web origin.
-- [x] Add password hashes to users, seed two organizers, and expose only allowlisted user fields.
-- [x] Issue 15-minute HS256 access JWTs and hashed, seven-day opaque refresh tokens at login.
-- [x] Rotate refresh tokens atomically, reject every invalid refresh with the same 401, and revoke active tokens for an account when a rotated token is replayed.
+- [ ] Add validated Redis configuration and separate Redis connections for cache/rate limiting and BullMQ.
+- [ ] Implement cache-aside event reads with jittered TTLs, versioned list keys, and delete/increment invalidation on writes.
+- [ ] Record cache hits and misses and emit a structured ratio every 100 lookups.
 
-## Authorization
+## Queues and waitlist promotion (Option A)
 
-- [x] Keep health and event discovery public while requiring a valid access token everywhere else.
-- [x] Restrict event creation to ORGANIZER/ADMIN and derive `organizerId` from the access token.
-- [x] Enforce event ownership for organizer updates/deletes with an ADMIN bypass.
-- [x] Enforce booking ownership for reads/cancellation and derive booking `userId` from the access token.
-- [x] Protect venue reads and restrict venue mutations to ORGANIZER/ADMIN.
+- [ ] Add the booking-email and waitlist-promote queues with retry, exponential backoff, and dead-letter handling.
+- [ ] Create WAITLISTED bookings when capacity is full while preserving serializable transaction and rebooking behavior.
+- [ ] Enqueue promotion only when a CONFIRMED booking is cancelled.
+- [ ] Build a worker that transactionally promotes the oldest waiter after re-checking capacity and then queues its confirmation email.
 
-## Proof and documentation
+## Rate limiting and proof
 
-- [x] Add Supertest coverage for the policy matrix, two-organizer BOLA denial, refresh rotation, replay denial, and cookie attributes.
-- [x] Document the public-route rationale, security-audit prompt and triage, compatibility choices, verification commands, and exit ticket.
-- [x] Run Prisma validation/generation, typecheck, lint, and tests; review the final diff.
+- [ ] Apply a strict fixed-window, per-IP Redis limiter to login and a per-user limiter to booking creation.
+- [ ] Add automated coverage for cache behavior, rate-limit thresholds/recovery, waitlisting, and idempotent promotion.
+- [ ] Add a scripted rate-limit burst proof and document the chosen limits.
+- [ ] Document caching-strategy interrogation notes, evidence, and the cache invalidation exit ticket in the PR description.
+- [ ] Run Prisma validation/generation, typecheck, lint, and tests; review the final diff.
+
+## Session 6 deploy preparation (manual, secrets stay outside Git)
+
+- [ ] Create Render, Neon, and Upstash accounts; provision services and store all three connection strings securely outside the repository.
